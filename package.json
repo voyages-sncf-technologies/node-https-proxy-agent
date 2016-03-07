@@ -1,6 +1,6 @@
 {
-  "name": "https-proxy-agent",
-  "version": "1.0.0",
+  "name": "vsct-https-proxy-agent",
+  "version": "1.1.0",
   "description": "An HTTP(s) proxy `http.Agent` implementation for HTTPS",
   "main": "https-proxy-agent.js",
   "scripts": {
@@ -9,6 +9,9 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/TooTallNate/node-https-proxy-agent.git"
+  },
+  "publishConfig" : {
+    "registry" : "http://nexus.socrate.vsct.fr/content/repositories/VSCT_NPM/"
   },
   "keywords": [
     "https",

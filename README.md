@@ -21,7 +21,7 @@ Installation
 Install with `npm`:
 
 ``` bash
-$ npm install https-proxy-agent
+$ npm install vsct-https-proxy-agent
 ```
 
 
@@ -105,6 +105,7 @@ The `opts` argument may either be a string URI of the proxy server to use, or an
   * `port` - Number - Proxy port to connect to. Required.
   * `secureProxy` - Boolean - If `true`, then use TLS to connect to the proxy. Defaults to `false`.
   * `headers` - Object - Additional HTTP headers to be sent on the HTTP CONNECT method.
+  * `timeout` - Number - Underlying socket timeout
   * Any other options given are passed to the `net.connect()`/`tls.connect()` functions.
 
 

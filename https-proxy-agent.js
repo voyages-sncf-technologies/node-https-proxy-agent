@@ -26,12 +26,17 @@ module.exports = HttpsProxyAgent;
 
 function HttpsProxyAgent (opts) {
   if (!(this instanceof HttpsProxyAgent)) return new HttpsProxyAgent(opts);
+  if ('object' == typeof opts && opts.hasOwnProperty('url') && 'string' == typeof opts.url) {
+    opts = extend(opts, url.parse(opts.url));
+  }
   if ('string' == typeof opts) opts = url.parse(opts);
   if (!opts) throw new Error('an HTTP(S) proxy server `host` and `port` must be specified!');
   debug('creating new HttpsProxyAgent instance: %o', opts);
   Agent.call(this, connect);
 
-  var proxy = extend({}, opts);
+  var proxy = extend({
+    timeout: 10000 // timeout default: 10s
+  }, opts);
 
   // if `true`, then connect to the proxy server over TLS. defaults to `false`.
   this.secureProxy = proxy.protocol ? /^https:?$/i.test(proxy.protocol) : false;
@@ -70,6 +75,8 @@ function connect (req, opts, fn) {
     socket = net.connect(proxy);
   }
 
+  socket.setTimeout(proxy.timeout);
+
   // we need to buffer any HTTP traffic that happens with the proxy before we get
   // the CONNECT response, so that if the response is anything other than an "200"
   // response code, then we can re-play the "data" events on the socket once the
@@ -88,7 +95,10 @@ function connect (req, opts, fn) {
     socket.removeListener('end', onend);
     socket.removeListener('error', onerror);
     socket.removeListener('close', onclose);
+    socket.removeListener('timeout', ontimeout);
     socket.removeListener('readable', read);
+
+    socket.destroy();
   }
 
   function onclose (err) {
@@ -97,6 +107,12 @@ function connect (req, opts, fn) {
 
   function onend () {
     debug('onend');
+  }
+
+  function ontimeout() {
+    debug('timeout');
+    cleanup();
+    fn(new Error('HTTP(S) proxy server timeout'));
   }
 
   function onerror (err) {
@@ -179,6 +195,7 @@ function connect (req, opts, fn) {
     buffers = null;
   }
 
+  socket.on('timeout', ontimeout);
   socket.on('error', onerror);
   socket.on('close', onclose);
   socket.on('end', onend);
