@@ -97,8 +97,6 @@ function connect (req, opts, fn) {
     socket.removeListener('close', onclose);
     socket.removeListener('timeout', ontimeout);
     socket.removeListener('readable', read);
-
-    socket.destroy();
   }
 
   function onclose (err) {
@@ -112,6 +110,7 @@ function connect (req, opts, fn) {
   function ontimeout() {
     debug('timeout');
     cleanup();
+    socket.destroy();
     fn(new Error('HTTP(S) proxy server timeout'));
   }
 
